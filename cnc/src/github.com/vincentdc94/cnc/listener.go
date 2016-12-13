@@ -2,6 +2,7 @@ package cnc
 
 import (
 	"bufio"
+	"encoding/json"
 	"net"
 	"net/textproto"
 )
@@ -29,18 +30,16 @@ func handleConnection(connection net.Conn) {
 	writer := bufio.NewWriter(connection)
 	tp := textproto.NewWriter(writer)
 
-	tp.PrintfLine("Uplink established")
-	tp.PrintfLine(".")
-	tp.PrintfLine("..")
-	tp.PrintfLine("...")
-	tp.PrintfLine("Welcome back, Commander")
-
 	torrents := GetYifyTorrents(10)
 
 	for _, torrent := range torrents {
-		//if torrent.Seeds <= 10 {
-		tp.PrintfLine(torrent.Hash)
-		//}
+
+		torrentJson, err := json.Marshal(torrent)
+
+		if err == nil {
+			tp.PrintfLine(string(torrentJson))
+		}
+
 	}
 
 }
