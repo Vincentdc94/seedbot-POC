@@ -1,0 +1,5 @@
+package cnc
+
+func CheckCommand() {
+
+}

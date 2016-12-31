@@ -3,6 +3,7 @@ package cnc
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/textproto"
 )
@@ -28,7 +29,10 @@ func BeginListen() {
 func handleConnection(connection net.Conn) {
 
 	writer := bufio.NewWriter(connection)
-	tp := textproto.NewWriter(writer)
+	tpw := textproto.NewWriter(writer)
+
+	reader := bufio.NewReader(connection)
+	tpr := textproto.NewReader(reader)
 
 	torrents := GetYifyTorrents(10)
 
@@ -37,7 +41,17 @@ func handleConnection(connection net.Conn) {
 		torrentJson, err := json.Marshal(torrent)
 
 		if err == nil {
-			tp.PrintfLine(string(torrentJson))
+			tpw.PrintfLine(string(torrentJson))
+		}
+
+	}
+
+	for {
+
+		message, err := tpr.ReadLine()
+
+		if err == nil {
+			fmt.Println(message)
 		}
 
 	}

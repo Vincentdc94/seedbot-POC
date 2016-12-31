@@ -77,7 +77,6 @@ func DoTorrent(magnet string, torrentPort int) (client Client, err error) {
 	go func() {
 		<-tor.GotInfo()
 		tor.DownloadAll()
-
 	}()
 
 	return

@@ -34,3 +34,10 @@ Ok even later alles werkt all basis ik krijg hashes doorgestuurd via de cnc serv
 3) Veel optimalizaties zijn nodig om gebied van juiste torrents te halen en downloads te verdelen en eventueel zelfs torrents toewijzen aan maar een selecte groep bots omdat er een limiet is aan hoeveel er nodig zijn per torrent. 
 Ook is het probleem dat als alle bots al 20 torrents gaan opslaan dat de computers snel volgeraken misschien een configuratie maken waarmee dat kan aangepast kan worden.
 
+
+*28/12/2016*
+
+Oplossing voor zware resource gebruik, torrents een voor een downloaden. En als de downloads klaar zijn laten seeden.
+
+CNC managed alle torrents maakt lijst van plaatsen voor torrent om in te vullen en elke keer als een bot gefinished is met downloaden van zijn torrent vraagt het een nieuwe aan van de cnc.
+Dan als de bot vol zit stopt het met torrents vragen maar andere vragen dan wel. zo vult het alle lege torrents op. cnc regelt verder de volgorde van hashes die uitgedeeld worden haalt ze weg uit een gemeenschappelijke array over de botconnectie threads.
