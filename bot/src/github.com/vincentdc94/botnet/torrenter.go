@@ -47,6 +47,7 @@ type ClientConfig struct {
 	MaxConnections int
 }
 
+//DoTorrent - Downloads the torrent by magnet link
 func DoTorrent(magnet string, torrentPort int) (client Client, err error) {
 
 	var tor *torrent.Torrent
@@ -82,6 +83,7 @@ func DoTorrent(magnet string, torrentPort int) (client Client, err error) {
 	return
 }
 
+//Close - close the torrent
 func (c *Client) Close() {
 	c.Torrent.Drop()
 	c.Client.Close()

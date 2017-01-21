@@ -3,6 +3,12 @@
 Botnet heeft typisch twee elementen in zijn netwerk. Een CNC server om de commando's te sturen naar de bot en bots die de commando's uitvoeren.
 Een andere variant van een botnet is de P2P variant die commando's onderling sturen zonder centrale CNC server. 
 
+## Golang als taal
+
+Om een extra dynamiek aan de POC te brengen besloot ik om Golang te gebruiken als taal voor het botnet. 
+Aangezien het client server applicaties goed ondersteund in zijn standard lib. Het feit dat de taal native gecompiled is geeft het nog wat extra voordelen die je graag hebt in traditionele botnets.
+
+
 ## We hebben torrents nodig!
 
 *8/12/2016*
@@ -41,3 +47,9 @@ Oplossing voor zware resource gebruik, torrents een voor een downloaden. En als 
 
 CNC managed alle torrents maakt lijst van plaatsen voor torrent om in te vullen en elke keer als een bot gefinished is met downloaden van zijn torrent vraagt het een nieuwe aan van de cnc.
 Dan als de bot vol zit stopt het met torrents vragen maar andere vragen dan wel. zo vult het alle lege torrents op. cnc regelt verder de volgorde van hashes die uitgedeeld worden haalt ze weg uit een gemeenschappelijke array over de botconnectie threads.
+
+**
+
+Verdelen van torrents over bots vereist unieke identifiers voor elke bot. Aangezien een MAC Adres op elke computer anders is gebruik ik deze as identificator.
+
+Ik ga afstappen van het halen van torrents vanuit yify. Ik ga een interface maken om torrents met hash manueel toe te voegen. Zo hoeft het systeem niet afhankelijk te zijn van een bron en kan het elke torrent die bestaat helpen om meer seeders te verkrijgen.

